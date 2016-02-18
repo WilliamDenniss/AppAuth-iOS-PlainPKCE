@@ -88,13 +88,6 @@ static NSUInteger const kStateSizeBytes = 32;
  */
 static NSUInteger const kCodeVerifierBytes = 32;
 
-/*! @var kPKCEChallengeMethodS256
-    @brief The code_challenge_method used by this library (always S256 since iOS is capable of
-        generating a SHA256 hash easily).
-    @see https://tools.ietf.org/html/rfc7636#section-4.3
- */
-static NSString *const kPKCEChallengeMethodS256 = @"S256";
-
 @implementation OIDAuthorizationRequest
 
 - (instancetype)init
@@ -226,21 +219,14 @@ static NSString *const kPKCEChallengeMethodS256 = @"S256";
 #pragma mark - PKCE params
 
 - (NSString *)codeChallenge {
-  if (!_codeVerifier) {
-    return nil;
-  }
-  // generates the code_challenge per spec https://tools.ietf.org/html/rfc7636#section-4.2
-  // code_challenge = BASE64URL-ENCODE(SHA256(ASCII(code_verifier)))
-  // NB. the ASCII conversion on the code_verifier entropy was done at time of generation.
-  NSData *sha256Verifier = [OIDTokenUtilities sha265:_codeVerifier];
-  return [OIDTokenUtilities encodeBase64urlNoPadding:sha256Verifier];
+  return _codeVerifier;
 }
 
 - (NSString *)codeChallengeMethod {
   if (!_codeVerifier) {
     return nil;
   }
-  return kPKCEChallengeMethodS256;
+  return @"plain";
 }
 
 
